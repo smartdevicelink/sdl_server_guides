@@ -4,3 +4,120 @@ With the introduction of WebEngine applications, the policy server requires addi
 The entrypoint for the custom implementation starts in the `customizable/webengine-bundle/index.js` file in the project. In the single function stub `handleBundle` the URL of the app bundle is passed in. The goal is for the policy server to download the bundle from the passed in URL, extract the bundle to get the compressed and uncompressed file size data, and to host it in a publicly accessible location. The new URL for the WebEngine app bundle and its size information is expected to be returned in the `cb` argument for the `handleBundle` function, and that information will automatically be reflected in future calls to the `/applications/store` route. Check the `customizable/webengine-bundle/index.js` file comments for specifics.
 
 It is recommended that the app bundles are hosted in a dedicated online file-sharing service such as AWS's S3 buckets. These URLs are expected to be persistent and unchanging, even after policy server restarts or migrations. 
+
+### S3 Storage Code Example
+You may use this code snippet for reference on how to implement the `handleBundle` function. This implementation stores the app bundles on an S3 bucket, and assumes that your computer's credentials are set up to be authenticated with AWS, and that you have installed the `node-stream-zip` and `aws-sdk` node modules to the policy server.
+
+```js
+// skeleton function for customized downloading and extracting of package information
+const request = require('request');
+const fs = require('fs');
+const UUID = require('uuid');
+const AWS = require('aws-sdk');
+const StreamZip = require('node-stream-zip');
+AWS.config.update({region: 'us-east-1'});
+const BUCKET_NAME = 'webengine-bundles';
+const TMP_FILE_NAME = 'tmp.zip';
+
+/**
+ * asynchronous function for downloading the bundle from the given url and extracting its size information
+ * @param package_url - a pubicly accessible external url that's used to download the bundle onto the policy server
+ * @param cb - a callback function that expects two arguments
+ *      if there was a failure in the process, it should be sent as the first argument. the policy server will log it
+ *      the second argument to return must follow the formatted object below
+ *      {
+ *          url: the policy server should save a copy of the app bundle somewhere publicly accessible
+ *              this url must be a full resolved url
+ *          size_compressed_bytes: the number of bytes of the compressed downloaded bundle
+ *          size_decompressed_bytes: the number of bytes of the extracted downloaded bundle
+ *      }
+ */
+exports.handleBundle = function (package_url, cb) {
+    let compressedSize = 0;
+    let bucketUrl = '';
+
+    // bucket creation
+    const bucketPromise = new AWS.S3().createBucket({Bucket: BUCKET_NAME, ACL: 'public-read'}).promise();
+
+    bucketPromise.then(data => { // read the URL and save it to a buffer variable
+        return readUrlToBuffer(package_url);
+    }).then(zipBuffer => { // submit the file contents to S3
+        compressedSize = zipBuffer.length;
+        const randomString = UUID.v4();
+        const fileName = `${randomString}.zip`;
+        bucketUrl = `https://${BUCKET_NAME}.s3.amazonaws.com/${fileName}`;
+        // make the bundle publicly accessible
+        const objectParams = {Bucket: BUCKET_NAME, ACL: 'public-read', Key: fileName, Body: zipBuffer};
+        // Create object upload promise
+        return new AWS.S3().putObject(objectParams).promise();
+    })
+    .then(() => { // unzip the contents of the bundle to get its uncompressed data information
+        return streamUrlToTmpFile(bucketUrl);
+    })
+    .then(() => {
+        return unzipAndGetUncompressedSize();
+    })
+    .then(uncompressedSize => {
+        // delete the tmp zip file
+        fs.unlink(TMP_FILE_NAME, () => {
+            // all the information has been collected
+            cb(null, {
+                url: bucketUrl,
+                size_compressed_bytes: compressedSize,
+                size_decompressed_bytes: uncompressedSize
+            });
+        });
+    })
+    .catch(err => {
+        console.error(err, err.stack);
+    });
+}
+
+function unzipAndGetUncompressedSize () {
+    let uncompressedSize = 0;
+
+    return new Promise((resolve, reject) => {
+        const zip = new StreamZip({
+            file: TMP_FILE_NAME,
+        });
+        zip.on('ready', () => {
+            // iterate through every unzipped entry and count up the file sizes
+            for (const entry of Object.values(zip.entries())) {
+                if (!entry.isDirectory) {
+                    uncompressedSize += entry.size;
+                }
+            }
+            // close the file once you're done
+            zip.close()
+            resolve(uncompressedSize);
+        });
+
+        // Handle errors
+        zip.on('error', err => { });
+    });
+}
+
+function streamUrlToTmpFile (url) {
+    return new Promise((resolve, reject) => {
+        request(url)
+            .pipe(fs.createWriteStream(TMP_FILE_NAME))
+            .on('close', resolve);
+    });
+}
+
+function readUrlToBuffer (url) {
+    return new Promise((resolve, reject) => {
+        let zipBuffer = [];
+
+        request(url)
+            .on('data', data => {
+                zipBuffer.push(data);
+            })
+            .on('close', function () { // file fully downloaded
+                // put the zip contents to a buffer 
+                resolve(Buffer.concat(zipBuffer));
+            });
+    })
+}
+
+```
