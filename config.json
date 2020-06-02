@@ -26,6 +26,8 @@
                     "name": "Custom Modules"
                 }, {
                     "name": "Migration Scripts"
+                }, {
+                    "name": "WebEngine Support"
                 }
             ]
         }, {
