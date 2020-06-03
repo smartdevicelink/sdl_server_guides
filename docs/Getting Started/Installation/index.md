@@ -20,7 +20,46 @@ The recommended branch to use is master, which should be used by default. Instal
 npm install
 ```
 
-The new version of the Policy Server requires a SQL database. Currently the only supported implementation is PostgreSQL. This guide will not cover how to get one running.
+The Policy Server requires a SQL database, and currently the only supported implementation is PostgreSQL. In the next section, we will cover how to get one running locally.
+
+## PostgreSQL Database
+To install PostgreSQL on a Mac with Homebrew, run the following command in a Terminal window:
+```
+brew install postgresql
+```
+
+Then run the following command to start PostgreSQL, and ensure that you won't need to start it again in case your system resets:
+```
+pg_ctl -D /usr/local/var/postgres start && brew services start postgresql
+```
+
+You can run the following command to know if you have PostgreSQL and also check that you are running the most recent version:
+```
+psql -V
+```
+
+In order to start creating users and databases, you will have to log in to PostgreSQL. It comes with a `postgres` user that has no password by default. Run the following command to log in as the `postgres` user:
+```
+psql -U postgres
+```
+
+You should now be in the postgres command-line interface. You can type `help` to get more info. If you want to continue using the `postgres` user, you can add a password with the following command:
+```
+ALTER USER postgres WITH PASSWORD '<password>';
+```
+
+If you want to create a new user, run the following commands to create one with a password and give them super user access:
+```
+CREATE USER <username> WITH PASSWORD '<password>';
+ALTER USER <username> WITH SUPERUSER;
+```
+
+Alternatively you can use the [GRANT](https://tableplus.com/blog/2018/04/postgresql-how-to-grant-access-to-users.html) command to limit the user's permissions. In the future, you can log in to PostgreSQL using this new user. Next, you'll need to run the following command to add a new database for the Policy Server to manage:
+```
+CREATE DATABASE <database_name>;
+```
+
+This database will be where the Policy Server stores all of its data pertaining to policy table generation. Remember to save your PostgreSQL username, password, and database name so you can use them in the next section. To exit the PostgreSQL CLI, simply type `quit` and hit Enter.
 
 ## Environment Variables
 
@@ -112,11 +151,6 @@ There are several settings that can be configured for Policy Server usage. See b
 | PRODUCTION_PG_PORT     | Number | The port number of the database (production mode)                              |
 
 Production/Staging environment variables for the database are now deprecated. Please use the corresponding `DB_` values in place of them (ex. `DB_USER` instead of `PRODUCTION_PG_USER` or `STAGING_PG_USER`).
-
-Once these environment variables are set, initialize the database. The database should be given the same name set in `DB_DATABASE`.
-
-Using the createdb program that comes with the installation of PostgreSQL, for example:
-`createdb policy_server`
 
 The Policy Server comes with migration scripts that can be run using npm scripts. You can see a list of all the possible scripts by looking in `package.json`, but these are the most important ones:
 
