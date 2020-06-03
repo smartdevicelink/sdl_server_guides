@@ -54,7 +54,7 @@ CREATE USER <username> WITH PASSWORD '<password>';
 ALTER USER <username> WITH SUPERUSER;
 ```
 
-Alternativey you can use the [GRANT](https://tableplus.com/blog/2018/04/postgresql-how-to-grant-access-to-users.html) command to limit the users permissions. In the future, you can log in to PostgreSQL using this new user. Next, you'll need to run the following command to add a new database for the Policy Server to manage:
+Alternatively you can use the [GRANT](https://tableplus.com/blog/2018/04/postgresql-how-to-grant-access-to-users.html) command to limit the user's permissions. In the future, you can log in to PostgreSQL using this new user. Next, you'll need to run the following command to add a new database for the Policy Server to manage:
 ```
 CREATE DATABASE <database_name>;
 ```
