@@ -1,7 +1,7 @@
 These are the API routes that the Policy Server exposes.
 
 ### `POST /login`
-If basic authentication is enabled, the Policy Server UI open a login page on startup which will call this route. The Policy Server will then validate that the entered password matches the one set up by the server maintainer.
+If basic authentication is enabled, the Policy Server UI opens a login page on startup which will call this route. The Policy Server will then validate that the entered password matches the one set up by the server maintainer.
 
 ---
 ### `GET /applications` & `GET /groups` & `GET /messages`
@@ -21,7 +21,7 @@ This route updates whether an app will have access to administrator functional g
 
 ---
 ### `POST /applications/passthrough`
-This route update whether an app will be able to send unknown RPCs through App Service RPC Passsthrough.
+This route updates whether an app will be able to send unknown RPCs through App Service RPC Passsthrough.
 
 ---
 ### `POST /applications/hybrid`
