@@ -1,5 +1,5 @@
 # Policy Server Guide Content
-Guide content for the [SDL Developer Portal](https://smartdevicelink.com/guides/sdl-server/getting-started/)
+Guide content for the [SDL Developer Portal](https://smartdevicelink.com/guides/sdl-server/getting-started/)..
 
 ## How to Use This Guide
 
