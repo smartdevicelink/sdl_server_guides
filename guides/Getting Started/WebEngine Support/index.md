@@ -1,12 +1,12 @@
-With the introduction of WebEngine applications, the policy server requires additional setup in order to be able to support them. This is because WebEngine apps need to be uploaded and servable for execution by supported HMIs, and the policy server provides the information necessary for downloading these app bundles. The implementation details are up to the policy server user, as the method of hosting these WebEngine app bundles may depend on the environment and manner in which the policy server is running. 
+With the introduction of WebEngine applications, the Policy Server requires additional setup in order to be able to support them. This is because WebEngine apps need to be uploaded and servable for execution by supported HMIs, and the Policy Server provides the information necessary for downloading these app bundles. The implementation details are up to the Policy Server user, as the method of hosting these WebEngine app bundles may depend on the environment and manner in which the Policy Server is running. 
 
 ### Getting Started
-The entrypoint for the custom implementation starts in the `customizable/webengine-bundle/index.js` file in the project. In the single function stub `handleBundle` the URL of the app bundle is passed in. The goal is for the policy server to download the bundle from the passed in URL, extract the bundle to get the compressed and uncompressed file size data, and to host it in a publicly accessible location. The new URL for the WebEngine app bundle and its size information is expected to be returned in the `cb` argument for the `handleBundle` function, and that information will automatically be reflected in future calls to the `/applications/store` route. Check the `customizable/webengine-bundle/index.js` file comments for specifics.
+The entrypoint for the custom implementation starts in the `customizable/webengine-bundle/index.js` file in the project. In the single function stub `handleBundle` the URL of the app bundle is passed in. The goal is for the Policy Server to download the bundle from the passed in URL, extract the bundle to get the compressed and uncompressed file size data, and to host it in a publicly accessible location. The new URL for the WebEngine app bundle and its size information is expected to be returned in the `cb` argument for the `handleBundle` function, and that information will automatically be reflected in future calls to the `/applications/store` route. Check the `customizable/webengine-bundle/index.js` file comments for specifics.
 
-It is recommended that the app bundles are hosted in a dedicated online file-sharing service such as AWS's S3 buckets. These URLs are expected to be persistent and unchanging, even after policy server restarts or migrations. 
+It is recommended that the app bundles are hosted in a dedicated online file-sharing service such as AWS's S3 buckets. These URLs are expected to be persistent and unchanging, even after Policy Server restarts or migrations. 
 
 ### S3 Storage Code Example
-You may use this code snippet for reference on how to implement the `handleBundle` function. This implementation stores the app bundles on an S3 bucket, and assumes that your computer's credentials are set up to be authenticated with AWS, and that you have installed the `node-stream-zip` and `aws-sdk` node modules to the policy server.
+You may use this code snippet for reference on how to implement the `handleBundle` function. This implementation stores the app bundles on an S3 bucket, and assumes that your computer's credentials are set up to be authenticated with AWS, and that you have installed the `node-stream-zip` and `aws-sdk` node modules to the Policy Server.
 
 ```js
 // skeleton function for customized downloading and extracting of package information
@@ -21,12 +21,12 @@ const TMP_FILE_NAME = 'tmp.zip';
 
 /**
  * asynchronous function for downloading the bundle from the given url and extracting its size information
- * @param package_url - a pubicly accessible external url that's used to download the bundle onto the policy server
+ * @param package_url - a pubicly accessible external url that's used to download the bundle onto the Policy Server
  * @param cb - a callback function that expects two arguments
- *      if there was a failure in the process, it should be sent as the first argument. the policy server will log it
+ *      if there was a failure in the process, it should be sent as the first argument. the Policy Server will log it
  *      the second argument to return must follow the formatted object below
  *      {
- *          url: the policy server should save a copy of the app bundle somewhere publicly accessible
+ *          url: the Policy Server should save a copy of the app bundle somewhere publicly accessible
  *              this url must be a full resolved url
  *          size_compressed_bytes: the number of bytes of the compressed downloaded bundle
  *          size_decompressed_bytes: the number of bytes of the extracted downloaded bundle
