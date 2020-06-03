@@ -33,7 +33,7 @@ This route updates whether an app should have RPC Encryption enabled.
 
 ---
 ### `PUT /applications/service/permission`
-This route modifies the app services permissions of an application.
+This route modifies the App Services permissions of an application.
 
 ---
 ### `POST & GET /applications/certificate/get`
@@ -107,7 +107,7 @@ The Policy Server UI makes a request to this route which returns an example Poli
 
 ---
 ### `POST /permissions/update`
-This route queries SHAID for an update to the list of app permissions in the Policy Server.
+The route updates the available permissions and permission relationships from SHAID.
 
 ---
 ### `GET /permissions/unmapped`
