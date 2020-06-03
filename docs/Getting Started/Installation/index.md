@@ -43,7 +43,7 @@ In order to start creating users and databases, you will have to log in to Postg
 psql -U postgres
 ```
 
-You should now be in the postgres command-line interface. You can type `help` to get more info. If you want to continue using the `postgres`, you can add a password with the following command:
+You should now be in the postgres command-line interface. You can type `help` to get more info. If you want to continue using the `postgres` user, you can add a password with the following command:
 ```
 ALTER USER postgres WITH PASSWORD '<password>';
 ```
