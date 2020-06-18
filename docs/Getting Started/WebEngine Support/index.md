@@ -19,7 +19,6 @@ const AWS = require('aws-sdk');
 const StreamZip = require('node-stream-zip');
 AWS.config.update({region: 'us-east-1'});
 const BUCKET_NAME = 'webengine-bundles';
-const TMP_FILE_NAME = 'tmp.zip';
 
 /**
  * asynchronous function for downloading the bundle from the given url and extracting its size information
@@ -37,50 +36,60 @@ const TMP_FILE_NAME = 'tmp.zip';
 exports.handleBundle = function (package_url, cb) {
     let compressedSize = 0;
     let bucketUrl = '';
+    const TMP_FILE_NAME = `${UUID.v4()}.zip`;
 
-    // bucket creation
-    const bucketPromise = new AWS.S3().createBucket({Bucket: BUCKET_NAME, ACL: 'public-read'}).promise();
-
-    bucketPromise.then(data => { // read the URL and save it to a buffer variable
-        return readUrlToBuffer(package_url);
-    }).then(zipBuffer => { // submit the file contents to S3
-        compressedSize = zipBuffer.length;
-        const randomString = UUID.v4();
-        const fileName = `${randomString}.zip`;
-        bucketUrl = `https://${BUCKET_NAME}.s3.amazonaws.com/${fileName}`;
-        // make the bundle publicly accessible
-        const objectParams = {Bucket: BUCKET_NAME, ACL: 'public-read', Key: fileName, Body: zipBuffer};
-        // Create object upload promise
-        return new AWS.S3().putObject(objectParams).promise();
-    })
-    .then(() => { // unzip the contents of the bundle to get its uncompressed data information
-        return streamUrlToTmpFile(bucketUrl);
-    })
-    .then(() => {
-        return unzipAndGetUncompressedSize();
-    })
-    .then(uncompressedSize => {
-        // delete the tmp zip file
-        fs.unlink(TMP_FILE_NAME, () => {
-            // all the information has been collected
-            cb(null, {
-                url: bucketUrl,
-                size_compressed_bytes: compressedSize,
-                size_decompressed_bytes: uncompressedSize
+    // create a new bucket if it doesnt already exist
+    new AWS.S3().createBucket({Bucket: BUCKET_NAME, ACL: 'public-read'}, err => {
+        // OperationAborted errors are expected, as we are potentially 
+        // calling this API multiple times simultaneously
+        if (err && err.code !== 'OperationAborted') {
+            return cb(err);
+        }
+        // read the URL and save it to a buffer variable
+        readUrlToBuffer(package_url)
+            .then(zipBuffer => { // submit the file contents to S3
+                compressedSize = zipBuffer.length;
+                const randomString = UUID.v4();
+                const fileName = `${randomString}.zip`;
+                bucketUrl = `https://${BUCKET_NAME}.s3.amazonaws.com/${fileName}`;
+                // make the bundle publicly accessible
+                const objectParams = {Bucket: BUCKET_NAME, ACL: 'public-read', Key: fileName, Body: zipBuffer};
+                // Create object upload promise
+                return new AWS.S3().putObject(objectParams).promise();
+            })
+            .then(() => { // unzip the contents of the bundle to get its uncompressed data information
+                return streamUrlToTmpFile(bucketUrl, TMP_FILE_NAME);
+            })
+            .then(() => {
+                return unzipAndGetUncompressedSize(TMP_FILE_NAME);
+            })
+            .then(uncompressedSize => {
+                // delete the tmp zip file
+                fs.unlink(TMP_FILE_NAME, () => {
+                    // all the information has been collected
+                    cb(null, {
+                        url: bucketUrl,
+                        size_compressed_bytes: compressedSize,
+                        size_decompressed_bytes: uncompressedSize
+                    });
+                });
+            })
+            .catch(err => {
+                // delete the tmp zip file
+                fs.unlink(TMP_FILE_NAME, () => {
+                    cb(err);
+                });
             });
-        });
-    })
-    .catch(err => {
-        console.error(err, err.stack);
     });
 }
 
-function unzipAndGetUncompressedSize () {
+function unzipAndGetUncompressedSize (fileName) {
     let uncompressedSize = 0;
 
     return new Promise((resolve, reject) => {
         const zip = new StreamZip({
-            file: TMP_FILE_NAME,
+            file: fileName,
+            skipEntryNameValidation: true
         });
         zip.on('ready', () => {
             // iterate through every unzipped entry and count up the file sizes
@@ -95,14 +104,14 @@ function unzipAndGetUncompressedSize () {
         });
 
         // Handle errors
-        zip.on('error', err => { });
+        zip.on('error', err => { reject(err) });
     });
 }
 
-function streamUrlToTmpFile (url) {
+function streamUrlToTmpFile (url, fileName) {
     return new Promise((resolve, reject) => {
         request(url)
-            .pipe(fs.createWriteStream(TMP_FILE_NAME))
+            .pipe(fs.createWriteStream(fileName))
             .on('close', resolve);
     });
 }
