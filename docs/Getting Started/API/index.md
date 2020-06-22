@@ -1,4 +1,13 @@
-These are the API routes that the Policy Server exposes.
+### Introduction
+Below are the API routes that the Policy Server exposes. 
+
+There may be CORS issues in the case where a separate web app needs to make API calls to the policy server, such as an HMI using the `applications/store` route. For cases like these, CORS is enabled. Preflight is also enabled for sufficiently complex POST requests. See below for the routes which have CORS or preflight enabled by default. The full list of routes and their middleware can also be seen in the project's `app/v1/app.js` file.
+
+| Route               | CORS | Preflight |
+|---------------------|------|-----------|
+| POST /staging/policy     | true | true      |
+| POST /production/policy  | true | true      |
+| GET /applications/store | true | false     |
 
 ### `POST /login`
 If basic authentication is enabled, the Policy Server UI opens a login page on startup which will call this route. The Policy Server will then validate that the entered password matches the one set up by the server maintainer.
