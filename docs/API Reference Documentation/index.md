@@ -19,7 +19,7 @@ Settings for a specific application are stored in the **app_policies** object as
 | priority | String | Priority level assigned to the application. |
 | default_hmi | String | HMI level given to the application following a successful registration with SDL Core. |
 | groups | Array of Strings | A list of functional groupings the application has access to. |
-| preconsented_groups | Array of Strings | List of [functional groupings](../functional-groupings) that do not require a user consent because the consent has already been given in another place. (e.g. an application EULA) |
+| preconsented_groups | Array of Strings | List of [functional groupings](https://smartdevicelink.com/en/guides/sdl-server/api-reference-documentation/policy-table/functional-groupings/) that do not require a user consent because the consent has already been given in another place. (e.g. an application EULA) |
 | RequestType | Array of Strings | List of Request Types that an app is allowed to use in a SystemRequest RPC. If omitted, all requestTypes are disallowed. If an empty array is provided, all requestTypes are allowed. |
 | RequestSubType | Array of Strings | List of Request SubTypes (defined by individual OEMs) that an app is allowed to use in a SystemRequest RPC. If omitted, all requestSubTypes are disallowed. If an empty array is provided, all requestSubTypes are allowed. |
 | AppHMIType | Array of Strings | List of HMI Types used to group the application into different containers in an HMI system. If omitted, all appHMITypes are allowed. |
@@ -165,7 +165,7 @@ Inside each language object is the data to be displayed or spoken by the module.
 | label | String |  |
 
 ## Version
-The version property in the **consumer_friendly_messages** object defines the current version of all the messages.  It is used during a [Policy Table update](../../policy-table-update) to determine whether or not the consumer friendly messages need to be updated.  The version must be in the format `###.###.###`.
+The version property in the **consumer_friendly_messages** object defines the current version of all the messages.  It is used during a [Policy Table update](https://smartdevicelink.com/en/guides/sdl-server/api-reference-documentation/policy-table-update/) to determine whether or not the consumer friendly messages need to be updated.  The version must be in the format `###.###.###`.
 
 ## Example
 An example of how the Consumer Friendly Messages portion of a Policy Table might look.
@@ -222,7 +222,7 @@ Devices are identified in the Policy Table using a unique identifier.  Device un
 Whether or not an SDL user has given permission for a feature can be stored for each device and application connected to a vehicle's head unit.  For example, a user may consent to allowing SDL to use their phone's cellular data to download Policy Table updates.  These consent records are stored in the **user_consent_records** property.
 
 ### Device
-User consent(s) for a device are stored in a property named **device** in the **user_consent_records** object.  The value of this property is an object with the following properies:
+User consent(s) for a device are stored in a property named **device** in the **user_consent_records** object.  The value of this property is an object with the following properties:
 
 <a name="User-Consent-Record-Properties"></a>
 
@@ -550,3 +550,4 @@ An example of how the Usage and Error portion of a Policy Table might look.
             }
         }
     }
+f

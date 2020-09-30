@@ -22,7 +22,7 @@ const BUCKET_NAME = 'webengine-bundles';
 
 /**
  * asynchronous function for downloading the bundle from the given url and extracting its size information
- * @param package_url - a pubicly accessible external url that's used to download the bundle onto the Policy Server
+ * @param package_url - a publicly accessible external url that's used to download the bundle onto the Policy Server
  * @param cb - a callback function that expects two arguments
  *      if there was a failure in the process, it should be sent as the first argument. the Policy Server will log it
  *      the second argument to return must follow the formatted object below
@@ -38,7 +38,7 @@ exports.handleBundle = function (package_url, cb) {
     let bucketUrl = '';
     const TMP_FILE_NAME = `${UUID.v4()}.zip`;
 
-    // create a new bucket if it doesnt already exist
+    // create a new bucket if it doesn't already exist
     new AWS.S3().createBucket({Bucket: BUCKET_NAME, ACL: 'public-read'}, err => {
         // OperationAborted errors are expected, as we are potentially 
         // calling this API multiple times simultaneously

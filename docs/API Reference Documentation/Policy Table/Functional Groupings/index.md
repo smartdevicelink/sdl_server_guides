@@ -14,7 +14,7 @@ Each RPC in the **rpcs** property has a unique name that represents an existing 
 
 | Property | Type | Description |
 | -------- | ---- | ----------- |
-| hmi_levels | Array | An ordered list of [HMI levels](../application-policies/#Application-HMI-Levels) that an application is allowed to use a the RPC command in. |
+| hmi_levels | Array | An ordered list of [HMI levels](https://smartdevicelink.com/en/guides/sdl-server/api-reference-documentation/policy-table/application-policies/#Application-HMI-Levels) that an application is allowed to use the RPC command in. |
 | parameters | Array | A list of allowed parameters that the application can use with the RPC command. |
 
 ## Example

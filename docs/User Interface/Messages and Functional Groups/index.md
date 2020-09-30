@@ -46,7 +46,7 @@ When creating a new functional group, first consider if there should be a user c
 ![New Functional Group Sequence Diagram](./assets/functional_group_flowchart.jpg)
 
 ## Consumer Messages
-For information on the language object properties, refer back to the documentation on the <a href="/docs/sdl-server/master/policy-table/consumer-friendly-messages/">consumer messages</a> object.
+For information on the language object properties, refer back to the documentation on the [consumer messages](https://smartdevicelink.com/en/guides/sdl-server/api-reference-documentation/policy-table/consumer-friendly-messages/) object.
 ![Consumer-Messages](./assets/Consumer-Messages.png)
 
 ## Staging 
