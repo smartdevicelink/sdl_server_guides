@@ -56,12 +56,13 @@ sudo apt-get update
 sudo apt-get -y install postgresql
 ```
 
-## Logging in to PostgreSQL
 You can run the following command to know if you have PostgreSQL and also check that you are running the most recent version:
 ```
 psql -V
 ```
 
+
+## Logging in to PostgreSQL
 In order to start creating users and databases, you will have to log in to PostgreSQL. It comes with a `postgres` user that should have no password by default. Run the following command to log in as the `postgres` user:
 ```
 psql -U postgres
@@ -79,7 +80,6 @@ local  all      postgres     trust
 ```
 
 Then restart postgres and attempt to log in to postgres again
-
 ```
 sudo service postgresql restart
 psql -U postgres
