@@ -8,6 +8,7 @@ The following must be installed before installation of the Policy Server can beg
 | `NPM` | 3.0.0+ |
 
 You must also acquire a set of SHAID API keys. These are made available to level 4 OEM members through the [developer portal](https://smartdevicelink.com/).
+
 NOTE: Be careful not to use sets of SHAID API keys from multiple vendors. Some Policy Server actions (like changing the auto-approval status of an app) will attempt to send information back to SHAID and if the wrong SHAID API keys are used then the action may fail.
 
 ## Setup Guide
@@ -198,7 +199,10 @@ Production/Staging environment variables for the database are now deprecated. Pl
 The Policy Server comes with migration scripts that can be run using npm scripts. You can see a list of all the possible scripts by looking in `package.json`, but these are the most important ones:
 
 * `start-server`: Runs the migration up script which initializes data in the database and starts the Policy Server
-* `dev` or `start`: Starts the server with hot reloading so any changes made to the UI are instantly updated in the browser
+* `dev` or `start`: Starts the dev server with hot reloading so any changes made to the UI are instantly updated in the browser
+
+NOTE: Using the dev server can cause CORS issues when connecting to the API so it should only be used when testing UI changes.
+
 * `build`: Generates a new staging/production build using webpack. This command should only be run if you made front-end modifications to the UI.
 * `start-pg-staging` **DEPRECATED**: Runs the migration up script which initializes data in the database, sets the environment to `staging` and starts the Policy Server
 * `start-pg-production` **DEPRECATED**: Runs the migration up script which initializes data in the database, sets the environment to `production` and starts the Policy Server
