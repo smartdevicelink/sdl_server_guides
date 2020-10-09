@@ -9,6 +9,8 @@ The following must be installed before installation of the Policy Server can beg
 
 You must also acquire a set of SHAID API keys. These are made available to level 4 OEM members through the [developer portal](https://smartdevicelink.com/).
 
+NOTE: Be careful not to use sets of SHAID API keys from multiple vendors. Some Policy Server actions (like changing the auto-approval status of an app) will attempt to send information back to SHAID and if the wrong SHAID API keys are used then the action may fail.
+
 ## Setup Guide
 Download the project to your current directory.
 ```
@@ -22,7 +24,7 @@ npm install
 
 The Policy Server requires a SQL database, and currently the only supported implementation is PostgreSQL. In the next section, we will cover how to get one running locally.
 
-## PostgreSQL Database
+## PostgreSQL Installation (Mac)
 To install PostgreSQL on a Mac with Homebrew, run the following command in a Terminal window:
 ```
 brew install postgresql
@@ -38,11 +40,53 @@ You can run the following command to know if you have PostgreSQL and also check 
 psql -V
 ```
 
-In order to start creating users and databases, you will have to log in to PostgreSQL. It comes with a `postgres` user that has no password by default. Run the following command to log in as the `postgres` user:
+## PostgreSQL Installation (Ubuntu)
+To install PostgreSQL in Ubuntu, run the following commands from the PostgreSQL documentation:
+```
+# Create the file repository configuration:
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+
+# Import the repository signing key:
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+
+# Update the package lists:
+sudo apt-get update
+
+# Install the latest version of PostgreSQL.
+# If you want a specific version, use 'postgresql-12' or similar instead of 'postgresql':
+sudo apt-get -y install postgresql
+```
+
+You can run the following command to know if you have PostgreSQL and also check that you are running the most recent version:
+```
+psql -V
+```
+
+
+## Logging in to PostgreSQL
+In order to start creating users and databases, you will have to log in to PostgreSQL. It comes with a `postgres` user that should have no password by default. Run the following command to log in as the `postgres` user:
 ```
 psql -U postgres
 ```
 
+If you're prompted for a password but have not yet set one, you'll have to locate and modify your pg_hba.conf file. Find the line that contains
+```
+local  all      postgres     peer
+```
+
+Update it to contain
+
+```
+local  all      postgres     trust
+```
+
+Then restart postgres and attempt to log in to postgres again
+```
+sudo service postgresql restart
+psql -U postgres
+```
+
+## Creating the PostgreSQL Database
 You should now be in the postgres command-line interface. You can type `help` to get more info. If you want to continue using the `postgres` user, you can add a password with the following command:
 ```
 ALTER USER postgres WITH PASSWORD '<password>';
@@ -155,7 +199,10 @@ Production/Staging environment variables for the database are now deprecated. Pl
 The Policy Server comes with migration scripts that can be run using npm scripts. You can see a list of all the possible scripts by looking in `package.json`, but these are the most important ones:
 
 * `start-server`: Runs the migration up script which initializes data in the database and starts the Policy Server
-* `dev` or `start`: Starts the server with hot reloading so any changes made to the UI are instantly updated in the browser
+* `dev` or `start`: Starts the dev server with hot reloading so any changes made to the UI are instantly updated in the browser
+
+NOTE: Using the dev server can cause CORS issues when connecting to the API so it should only be used when testing UI changes.
+
 * `build`: Generates a new staging/production build using webpack. This command should only be run if you made front-end modifications to the UI.
 * `start-pg-staging` **DEPRECATED**: Runs the migration up script which initializes data in the database, sets the environment to `staging` and starts the Policy Server
 * `start-pg-production` **DEPRECATED**: Runs the migration up script which initializes data in the database, sets the environment to `production` and starts the Policy Server
