@@ -2,7 +2,7 @@
 The module configuration property contains information used to configure SDL Core for use on the current vehicle.
 
 ## Notifications
-There is a limit for the number of notifications that can be displayed per priority level.  The limit is instead based on notifications per minute.  You can configure these in the **notifications_per_minute_by_priority** property.  The following are the available priority levels.
+There is a limit for the number of notifications that can be displayed per priority level.  The limit is instead based on notifications per minute.  You can configure these in the **notifications_per_minute_by_priority** property which has a max array size of 5.  The following are the available priority levels.
 
 | Property | Type | Description |
 | -------- | ---- | ----------- |
