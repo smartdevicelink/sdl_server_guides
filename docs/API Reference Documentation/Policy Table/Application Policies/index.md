@@ -38,6 +38,7 @@ An application can be categorized by an HMI type allowing the SDL-enabled head u
 | SOCIAL |  |
 | SYSTEM |  |
 | TESTING |  |
+| WEB_VIEW |  |
 
 <a name="Application-HMI-Levels"></a>
 
