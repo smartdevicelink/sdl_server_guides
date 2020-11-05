@@ -52,7 +52,7 @@ Service Provider options appear when an application has requested to be an App S
 ### Developer Contact Info
 | Property | Definition |
 |----------|---------|
-| Vendor | The name of the developer to contact with regards to this application. |
+| Vendor | The name of the developer to contact regarding this application. |
 | Email | The contact email for the Vendor. |
 | Phone | The contact phone number for the Vendor. |
 | Tech Email | The optional contact email for technical issues regarding the app. |

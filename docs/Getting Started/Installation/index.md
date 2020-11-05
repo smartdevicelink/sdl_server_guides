@@ -204,6 +204,7 @@ The Policy Server comes with migration scripts that can be run using npm scripts
 NOTE: Using the dev server can cause CORS issues when connecting to the API so it should only be used when testing UI changes.
 
 * `build`: Generates a new staging/production build using webpack. This command should only be run if you made front-end modifications to the UI.
+* `lint`: Parses the Policy Server code and checks for syntactical or stylistic errors.
 * `start-pg-staging` **DEPRECATED**: Runs the migration up script which initializes data in the database, sets the environment to `staging` and starts the Policy Server
 * `start-pg-production` **DEPRECATED**: Runs the migration up script which initializes data in the database, sets the environment to `production` and starts the Policy Server
 * `db-migrate-reset-pg-staging` **DEPRECATED**: Runs the migration down script which drops all the data and tables in the staging database

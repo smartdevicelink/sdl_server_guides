@@ -38,6 +38,7 @@ An application can be categorized by an HMI type allowing the SDL-enabled head u
 | SOCIAL |  |
 | SYSTEM |  |
 | TESTING |  |
+| WEB_VIEW |  |
 
 <a name="Application-HMI-Levels"></a>
 
@@ -80,7 +81,7 @@ An HMI Level describes the state of an application.  Resources are granted to an
 | OEM_SPECIFIC | Used for OEM defined requests, requestSubType should be used to determine how to handle this type of request. |
 
 ## Default
-A default application configuration can be stored in the **app_policies** object as a property named **default**.  This property's value is an object containing any valid [application property](#Application-Property) excluding **certificate** and **nicknames**.
+A default application configuration can be stored in the **app_policies** object as a property named **default**.  This property's value is an object containing any valid [application property](https://smartdevicelink.com/en/guides/sdl-server/api-reference-documentation/policy-table/application-policies/#Application-Property) excluding **certificate** and **nicknames**.
 
 ## Device
 Permissions granted to the user's device post-DataConsent.
