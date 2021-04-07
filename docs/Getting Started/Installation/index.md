@@ -4,8 +4,10 @@ The following must be installed before installation of the Policy Server can beg
 | Project | Version |
 |---------|---------|
 | `Postgres` | 9.6+ |
-| `Node.js` | 4.0.0+ |
+| `Node.js` | 4.0.0 - 12.22.0 |
 | `NPM` | 3.0.0+ |
+
+Note the maximum Node version. **The policy server will not work on Node versions 13 or higher.**
 
 You must also acquire a set of SHAID API keys. These are made available to level 4 OEM members through the [developer portal](https://smartdevicelink.com/).
 
