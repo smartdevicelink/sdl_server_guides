@@ -132,6 +132,7 @@ There are several settings that can be configured for Policy Server usage. See b
 | CERTIFICATE_HASH              | String  | sha256                          | The cryptographic hash function to use. Defaults to 'sha256'                                                                                                 |
 | CERTIFICATE_DAYS              | Number  | 7                               | The number of days until the certificate expires. Defaults to 7                                                                                              |
 | ENCRYPTION_REQUIRED           | Boolean | true | Whether or not to require RPC encryption for auto-approved app versions. Defaults to "false"                                                                 |
+| MODULE_CONFIG_ENCRYPT_CERT_BUNDLE           | Boolean | true | Whether to package the module config's certificate and private key into a pkcs12 bundle string using the CERTIFICATE_PASSPHRASE. If false (default), it will just be a concatenation of the certificate and the private key                                                                 |
 
 ### Miscellaneous Environment Variables
 | Name                  | Type    | Example | Description                                                                                                          |
