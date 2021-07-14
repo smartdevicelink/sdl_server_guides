@@ -8,6 +8,7 @@ There may be CORS issues in the case where a separate web app needs to make API 
 | POST /staging/policy     | true | true      |
 | POST /production/policy  | true | true      |
 | GET /applications/store | true | false     |
+| GET /applications/store/staging | true | false     |
 
 ### `POST /login`
 If basic authentication is enabled, the Policy Server UI opens a login page on startup which will call this route. The Policy Server will then validate that the entered password matches the one set up by the server maintainer.
@@ -96,6 +97,10 @@ Updates the functional groups for which a given application has access.
 ---
 ### `GET /applications/store`
 Retrieves approved, embedded application information, filterable by `uuid` or by `transport_type`. The possible values for `transport_type` are `webengine` and `websocket`. The return object includes app bundle information such as the location of the bundle and its file size, compressed and uncompressed. The logic of where to store these app packages is customizable by the policy server. See the `customizable/webengine-bundle/index.js` file for details.
+
+---
+### `GET /applications/store/staging`
+Does the same thing as /applications/store, but returns apps whose approval statuses are in staging.
 
 ---
 ### `POST /webhook`
