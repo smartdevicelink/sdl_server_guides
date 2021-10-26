@@ -283,7 +283,7 @@ Each RPC in the **rpcs** property has a unique name that represents an existing 
 
 | Property | Type | Description |
 | -------- | ---- | ----------- |
-| hmi_levels | Array | An ordered list of [HMI levels](../application-policies/#Application-HMI-Levels) that an application is allowed to use a the RPC command in. |
+| hmi_levels | Array | An ordered list of [HMI levels](https://smartdevicelink.com/en/guides/sdl-server/api-reference-documentation/policy-table/application-policies/) that an application is allowed to use a the RPC command in. |
 | parameters | Array | A list of allowed parameters that the application can use with the RPC command. |
 
 ## Example
@@ -359,7 +359,7 @@ There is a limit for the number of notifications that can be displayed per prior
 <a name="Policy-Table-Update-Configurations"></a>
 
 ## Policy Table Update Configurations
-Periodically changes will be made to a Policy Table, either by the Policy Server or SDL Core. This means SDL Core should check for and perform a [Policy Table update](/docs/sdl-server/policy-table-update), which synchronizes the local and Policy Server Policy Tables. You can configure when SDL Core will check using the following configurations.
+Periodically changes will be made to a Policy Table, either by the Policy Server or SDL Core. This means SDL Core should check for and perform a [Policy Table update](https://smartdevicelink.com/en/guides/sdl-server/getting-started/server-update/), which synchronizes the local and Policy Server Policy Tables. You can configure when SDL Core will check using the following configurations.
 
 | Property | Type | Description |
 | -------- | ---- | ----------- |
