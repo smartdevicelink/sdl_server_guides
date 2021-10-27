@@ -1,7 +1,7 @@
 # Overview
 This document provides the information for creating and integrating the SmartDeviceLink (SDL) server component with the mobile libraries and vehicle's Head Unit (HU).
 
-The Policy Server's main purpose is to curate [policy tables](/docs/sdl-server/master/policy-table/overview) composed of rules and permissions defined by a vehicle’s OEM. Each vehicle will download its Policy Table and use it to govern SDL behaviors.
+The Policy Server's main purpose is to curate [policy tables](https://smartdevicelink.com/en/guides/sdl-server/api-reference-documentation/policy-table/overview/) composed of rules and permissions defined by a vehicle’s OEM. Each vehicle will download its Policy Table and use it to govern SDL behaviors.
 
 ## Abbreviations and Definitions
 Abbreviations used in this document are collected in the table below

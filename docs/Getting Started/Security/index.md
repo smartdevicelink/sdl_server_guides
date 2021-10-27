@@ -59,9 +59,9 @@ The following environment variables are the most relevant for getting the policy
 |CERTIFICATE_EMAIL_ADDRESS|false|Default information of the issuer's email address
 |CERTIFICATE_HASH|false|The cryptographic hash function to use. Defaults to sha256.
 |CERTIFICATE_DAYS|false|The number of days until the certificate expires. Defaults to 7 days.
-
+|MODULE_CONFIG_ENCRYPT_CERT_BUNDLE|false|Whether to package the module config's certificate and private key into a pkcs12 bundle string using the CERTIFICATE_PASSPHRASE. If false (default), it will just be a concatenation of the certificate and the private key   
 
 To know if this process was successful and if your policy server is now capable of generating keys and certificates, check the About page to see if certificate generation is enabled.
 
 ## Retrieving the Certificates
-SDL Core's certificate is stored in the module_config of the policy table and is updated via a Policy Table Update. For an app to retrieve its certificate, it must make either a `GET` or `POST` request to the `/applications/certificate/get` endpoint. See the API documentation for more details.
+SDL Core's certificate is stored in the module_config of the policy table and is updated via a Policy Table Update. For an app to retrieve its certificate, it must make either a `GET` or `POST` request to the `/api/v1/applications/certificate/get` endpoint. See the API documentation for more details.
