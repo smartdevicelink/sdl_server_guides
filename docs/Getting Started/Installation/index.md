@@ -4,10 +4,8 @@ The following must be installed before installation of the Policy Server can beg
 | Project | Version |
 |---------|---------|
 | `Postgres` | 9.6+ |
-| `Node.js` | 4.0.0 - 12.22.0 |
+| `Node.js` | 8.12.0+ |
 | `NPM` | 3.0.0+ |
-
-Note the maximum Node version. **The policy server will not work on Node versions 13 or higher.**
 
 You must also acquire a set of SHAID API keys. These are made available to level 4 OEM members through the [developer portal](https://smartdevicelink.com/).
 
@@ -124,6 +122,11 @@ There are several settings that can be configured for Policy Server usage. See b
 | DB_PASSWORD        | String | password         | The password used to log into the database                                |
 | DB_HOST            | String | rds-database.com | The host name or IP address of the database                               |
 | DB_PORT            | Number | 5432             | The port number of the database                                           |
+| TEST_PG_USER            | String | postgres         | Same as DB_USER but for specifically running tests via `npm run test`           |
+| TEST_PG_DATABASE        | String | postgres         | Same as DB_DATABASE but for specifically running tests via `npm run test`              |
+| TEST_PG_PASSWORD        | String | password         | Same as DB_PASSWORD but for specifically running tests via `npm run test`                                |
+| TEST_PG_HOST            | String | rds-database.com | Same as DB_HOST but for specifically running tests via `npm run test`                               |
+| TEST_PG_PORT            | Number | 5432             | Same as DB_PORT but for specifically running tests via `npm run test`                                           |
 
 ### SHAID Environment Variables
 | Name             | Type   | Description                                                                                                                             |
@@ -183,22 +186,6 @@ There are several settings that can be configured for Policy Server usage. See b
 |-----------------------|---------|---------|----------------------------------------------------------------------------------------------------------------------|
 | AUTO_APPROVE_ALL_APPS | Boolean | true    | Whether or not to auto-approve all app versions received by SHAID (except for blacklisted apps). Defaults to "false" |
 
-### Deprecated Environment Variables
-| Name                   | Type   | Description                                                                    |
-|------------------------|--------|--------------------------------------------------------------------------------|
-| STAGING_PG_USER        | String | The name of the user to allow the server access the database (staging mode)    |
-| STAGING_PG_DATABASE    | String | The name of the database where policy and app data is stored (staging mode)    |
-| STAGING_PG_PASSWORD    | String | The password used to log into the database (staging mode)                      |
-| STAGING_PG_HOST        | String | The host name or IP address of the database (staging mode)                     |
-| STAGING_PG_PORT        | Number | The port number of the database (staging mode)                                 |
-| PRODUCTION_PG_USER     | String | The name of the user to allow the server access the database (production mode) |
-| PRODUCTION_PG_DATABASE | String | The name of the database where policy and app data is stored (production mode) |
-| PRODUCTION_PG_PASSWORD | String | The password used to log into the database (production mode)                   |
-| PRODUCTION_PG_HOST     | String | The host name or IP address of the database (production mode)                  |
-| PRODUCTION_PG_PORT     | Number | The port number of the database (production mode)                              |
-
-Production/Staging environment variables for the database are now deprecated. Please use the corresponding `DB_` values in place of them (ex. `DB_USER` instead of `PRODUCTION_PG_USER` or `STAGING_PG_USER`).
-
 The Policy Server comes with migration scripts that can be run using npm scripts. You can see a list of all the possible scripts by looking in `package.json`, but these are the most important ones:
 
 * `start-server`: Runs the migration up script which initializes data in the database and starts the Policy Server
@@ -206,13 +193,11 @@ The Policy Server comes with migration scripts that can be run using npm scripts
 
 NOTE: Using the dev server can cause CORS issues when connecting to the API so it should only be used when testing UI changes.
 
-* `build`: Generates a new staging/production build using webpack. This command should only be run if you made front-end modifications to the UI.
+* `build`: Generates a new staging/production build using webpack. Not required to be used if you're using the start-server script.
 * `lint`: Parses the Policy Server code and checks for syntactical or stylistic errors.
-* `start-pg-staging` **DEPRECATED**: Runs the migration up script which initializes data in the database, sets the environment to `staging` and starts the Policy Server
-* `start-pg-production` **DEPRECATED**: Runs the migration up script which initializes data in the database, sets the environment to `production` and starts the Policy Server
-* `db-migrate-reset-pg-staging` **DEPRECATED**: Runs the migration down script which drops all the data and tables in the staging database
-
-Production/Staging scripts are now deprecated. Please use `start-server` instead of `start-pg-staging` or `start-pg-production`.
+* `test`: Runs the unit tests packaged with the project. Uses the `TEST_` database environment variables to modify the database. **This will clear all policy server data when running! Make sure you use a database you do not mind being cleared!**
+* `db-migrate-up`: Runs all migrations on the database.
+* `db-migrate-reset`: Runs migration downs and clears the database.
 
 Run the following command to finalize set up and start the server.
 
