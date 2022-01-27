@@ -7,6 +7,8 @@ The following must be installed before installation of the Policy Server can beg
 | `Node.js` | 8.12.0+ |
 | `NPM` | 3.0.0+ |
 
+**Note: For policy server major version 2, be aware it will not function if the Node.js version is 13 or higher.**
+
 You must also acquire a set of SHAID API keys. These are made available to level 4 OEM members through the [developer portal](https://smartdevicelink.com/).
 
 NOTE: Be careful not to use sets of SHAID API keys from multiple vendors. Some Policy Server actions (like changing the auto-approval status of an app) will attempt to send information back to SHAID and if the wrong SHAID API keys are used then the action may fail.
