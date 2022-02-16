@@ -493,7 +493,7 @@ An example of how the Module Meta portion of a Policy Table might look.
 
 
 # Usage and Errors
-Errors and usage statistics that occur while an application is in use or are related to an application are record. The information does not contain user information and is very small as to use as little mobile data as possible. This data is sent to the Policy Server when performing a [Policy Table update](../../policy-table-update).
+Errors and usage statistics that occur while an application is in use or are related to an application are record. The information does not contain user information and is very small as to use as little mobile data as possible. This data is sent to the Policy Server when performing a [Policy Table update](https://smartdevicelink.com/en/guides/sdl-server/api-reference-documentation/policy-table-update/).
 
 
 ## Application Errors
