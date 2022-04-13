@@ -18,7 +18,7 @@ Devices are identified in the Policy Table using a unique identifier.  Device un
 Whether or not an SDL user has given permission for a feature can be stored for each device and application connected to a vehicle's head unit.  For example, a user may consent to allowing SDL to use their phone's cellular data to download Policy Table updates.  These consent records are stored in the **user_consent_records** property.
 
 ### Device
-User consent(s) for a device are stored in a property named **device** in the **user_consent_records** object.  The value of this property is an object with the following properies:
+User consent(s) for a device are stored in a property named **device** in the **user_consent_records** object.  The value of this property is an object with the following properties:
 
 <a name="User-Consent-Record-Properties"></a>
 

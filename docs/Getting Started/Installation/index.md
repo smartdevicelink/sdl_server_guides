@@ -1,13 +1,53 @@
+## Docker Install (For versions 3.0+)
+### Docker Compose Installation
+
+[Docker Engine is required to be installed.](https://docs.docker.com/engine/install/) The `docker` folder in the policy server contains all the files needed to set up the policy server through docker images. The `docker-compose.yml` file will spin up the server, the Postgres database, and the Redis database and automatically connect them all. The policy server is made available on `http://localhost:3000`.
+
+### Environment Variables
+An `.env` file is expected in the `docker` directory, and the Dockerfile will pull in all environment variables from that file, just like how the policy server uses the `.env` file in the root directory. The Dockerfile uses the remote sdl_server repository instead of the local installation. The branch can be changed by changing the `docker-compose.yml` file's arg VERSION value: its default is the master branch.
+
+The following are notable `.env` variables to the docker environment. They are not a comprehensive list. The usual variables such as `SHAID_PUBLIC_KEY` and `SHAID_SECRET_KEY` are still required for usage. Connection to postgres and redis is automatic and no further configuration is required for them, such as setting environment variables.
+
+| Name               | Type   | Usage          | Description                                                               |
+|--------------------|--------|------------------|---------------------------------------------------------------------------|
+| DB_HOST | String | Postgres      | Please do not use this value. It is predefined to work with Docker Compose|
+| DB_PASSWORD | String | Postgres      | Not required to be set. Defaults to "postgres" |
+| DB_USER | String | Postgres      | Not required to be set. Defaults to "postgres" |
+| DB_DATABASE | String | Postgres      | Not required to be set. Defaults to "postgres" |
+| CACHE_HOST | String | Redis      | Please do not set this value. It is predefined to work with Docker Compose|
+| BUCKET_NAME | String | WebEngine app support      | The name of the S3 bucket to store app bundles |
+| AWS_REGION | String | WebEngine app support      | The region of the S3 bucket |
+| AWS_ACCESS_KEY_ID | String | WebEngine app support      | [AWS credentials to allow S3 usage](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/loading-node-credentials-environment.html). These are exclusive to the docker install of the policy server! |
+| AWS_SECRET_ACCESS_KEY | String | WebEngine app support      | [AWS credentials to allow S3 usage](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/loading-node-credentials-environment.html). These are exclusive to the docker install of the policy server! |
+
+Note the nearly empty `keys` subfolder. Insert your own key and pem files meant for the certificate generation feature and SSL connections in there, and the contents will be copied into the docker container policy server's `customizable/ca` folder and `customizable/ssl` folder. You will still need the necessary environment variables to activate certificate generation and SSL connections respectively.
+
+### Commands
+You need to run the following commands in the docker directory of the project.
+
+To start a new or existing cluster, remembering to rebuild the policy server image in case of .env changes (Make sure you are in the `docker` folder of the policy server):
+`docker compose up --build`
+Use Ctrl+C once to stop all the docker containers. 
+
+To tear down a cluster without removing the volume (this will delete the database contents!):
+`docker compose down`
+
+To tear down a cluster and remove the volume (this will delete the database contents!):
+`docker compose down -v`
+
+Read the rest of this page if you wish to launch the server without the use of Docker.
+
+# Normal Installation
 ## Prerequisites
 The following must be installed before installation of the Policy Server can begin:
 
 | Project | Version |
 |---------|---------|
 | `Postgres` | 9.6+ |
-| `Node.js` | 4.0.0 - 12.22.0 |
+| `Node.js` | 8.12.0+ |
 | `NPM` | 3.0.0+ |
 
-Note the maximum Node version. **The policy server will not work on Node versions 13 or higher.**
+**Note: For policy server major version 2, be aware it will not function if the Node.js version is 13 or higher.**
 
 You must also acquire a set of SHAID API keys. These are made available to level 4 OEM members through the [developer portal](https://smartdevicelink.com/).
 
@@ -124,6 +164,11 @@ There are several settings that can be configured for Policy Server usage. See b
 | DB_PASSWORD        | String | password         | The password used to log into the database                                |
 | DB_HOST            | String | rds-database.com | The host name or IP address of the database                               |
 | DB_PORT            | Number | 5432             | The port number of the database                                           |
+| TEST_PG_USER            | String | postgres         | Same as DB_USER but for specifically running tests via `npm run test`           |
+| TEST_PG_DATABASE        | String | postgres         | Same as DB_DATABASE but for specifically running tests via `npm run test`              |
+| TEST_PG_PASSWORD        | String | password         | Same as DB_PASSWORD but for specifically running tests via `npm run test`                                |
+| TEST_PG_HOST            | String | rds-database.com | Same as DB_HOST but for specifically running tests via `npm run test`                               |
+| TEST_PG_PORT            | Number | 5432             | Same as DB_PORT but for specifically running tests via `npm run test`                                           |
 
 ### SHAID Environment Variables
 | Name             | Type   | Description                                                                                                                             |
@@ -183,22 +228,6 @@ There are several settings that can be configured for Policy Server usage. See b
 |-----------------------|---------|---------|----------------------------------------------------------------------------------------------------------------------|
 | AUTO_APPROVE_ALL_APPS | Boolean | true    | Whether or not to auto-approve all app versions received by SHAID (except for blacklisted apps). Defaults to "false" |
 
-### Deprecated Environment Variables
-| Name                   | Type   | Description                                                                    |
-|------------------------|--------|--------------------------------------------------------------------------------|
-| STAGING_PG_USER        | String | The name of the user to allow the server access the database (staging mode)    |
-| STAGING_PG_DATABASE    | String | The name of the database where policy and app data is stored (staging mode)    |
-| STAGING_PG_PASSWORD    | String | The password used to log into the database (staging mode)                      |
-| STAGING_PG_HOST        | String | The host name or IP address of the database (staging mode)                     |
-| STAGING_PG_PORT        | Number | The port number of the database (staging mode)                                 |
-| PRODUCTION_PG_USER     | String | The name of the user to allow the server access the database (production mode) |
-| PRODUCTION_PG_DATABASE | String | The name of the database where policy and app data is stored (production mode) |
-| PRODUCTION_PG_PASSWORD | String | The password used to log into the database (production mode)                   |
-| PRODUCTION_PG_HOST     | String | The host name or IP address of the database (production mode)                  |
-| PRODUCTION_PG_PORT     | Number | The port number of the database (production mode)                              |
-
-Production/Staging environment variables for the database are now deprecated. Please use the corresponding `DB_` values in place of them (ex. `DB_USER` instead of `PRODUCTION_PG_USER` or `STAGING_PG_USER`).
-
 The Policy Server comes with migration scripts that can be run using npm scripts. You can see a list of all the possible scripts by looking in `package.json`, but these are the most important ones:
 
 * `start-server`: Runs the migration up script which initializes data in the database and starts the Policy Server
@@ -206,13 +235,11 @@ The Policy Server comes with migration scripts that can be run using npm scripts
 
 NOTE: Using the dev server can cause CORS issues when connecting to the API so it should only be used when testing UI changes.
 
-* `build`: Generates a new staging/production build using webpack. This command should only be run if you made front-end modifications to the UI.
+* `build`: Generates a new staging/production build using webpack. Not required to be used if you're using the start-server script.
 * `lint`: Parses the Policy Server code and checks for syntactical or stylistic errors.
-* `start-pg-staging` **DEPRECATED**: Runs the migration up script which initializes data in the database, sets the environment to `staging` and starts the Policy Server
-* `start-pg-production` **DEPRECATED**: Runs the migration up script which initializes data in the database, sets the environment to `production` and starts the Policy Server
-* `db-migrate-reset-pg-staging` **DEPRECATED**: Runs the migration down script which drops all the data and tables in the staging database
-
-Production/Staging scripts are now deprecated. Please use `start-server` instead of `start-pg-staging` or `start-pg-production`.
+* `test`: Runs the unit tests packaged with the project. Uses the `TEST_` database environment variables to modify the database. **This will clear all policy server data when running! Make sure you use a database you do not mind being cleared!**
+* `db-migrate-up`: Runs all migrations on the database.
+* `db-migrate-reset`: Runs migration downs and clears the database.
 
 Run the following command to finalize set up and start the server.
 
