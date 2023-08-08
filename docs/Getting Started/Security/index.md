@@ -36,7 +36,7 @@ Once OpenSSL is properly installed, you'll need to take the necessary steps to e
 
 | Command | Explanation|
 |---------|------------|
-|openssl genrsa -out CA.key 2048| This creates a 2048 bit RSA private key and saves it in the file "CA.key". It will later be used for signing certificates.|
+|openssl genrsa -out CA.key 2048| This creates a 2048 bit RSA private key and saves it in the file "CA.key". It will later be used for signing certificates. WARNING: As of OpenSSL 3.0.0+ you will need to pass in a `-traditional` flag to generate private keys that are still compatible with the Policy Server, like so: `openssl genrsa -traditional -out CA.key 2048`|
 |openssl req -x509 -new -nodes -key CA.key -sha256 -days 3650 -out CA.pem| This creates a certificate in the file name "CA.pem" that will be used in the creation of additional certificates. It is set to expire after 10 years. OpenSSL will then prompt you for further information.|
 
 The CA files will then need to be relocated to the `./customizable/ca` folder and their file names will need to be specified in the `.env` file.
