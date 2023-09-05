@@ -64,6 +64,12 @@ The recommended branch to use is master, which should be used by default. Instal
 npm install
 ```
 
+NOTE: Starting with the Policy Server v3.1.1, you'll need the following command to install dependencies:
+```
+npm install --legacy-peer-deps
+```
+
+
 The Policy Server requires a SQL database, and currently the only supported implementation is PostgreSQL. In the next section, we will cover how to get one running locally.
 
 ## PostgreSQL Installation (Mac)
