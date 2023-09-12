@@ -8,16 +8,18 @@ The entrypoint for the custom implementation starts in the `customizable/webengi
 It is recommended that the app bundles are hosted in a dedicated online file-sharing service such as AWS's S3 buckets. These URLs are expected to be persistent and unchanging, even after Policy Server restarts or migrations. 
 
 ### S3 Storage Code Example
-You may use this code snippet for reference on how to implement the `handleBundle` function. This implementation stores the app bundles on an S3 bucket, and assumes that your computer's credentials are set up to be authenticated with AWS, and that you have installed the `node-stream-zip` and `aws-sdk` node modules to the Policy Server.
+You may use this code snippet for reference on how to implement the `handleBundle` function. This implementation stores the app bundles on an S3 bucket, and assumes that the bucket exists, and that your computer's credentials are set up to be authenticated with AWS, and that you have installed the `node-stream-zip` and `aws-sdk` node modules to the Policy Server. Note that AWS has changed how new buckets are configured as of April 2023, so make sure you have your bucket set up to be public and to enable ACLs in the Object Ownership settings.
 
 ```js
 // skeleton function for customized downloading and extracting of package information
-const request = require('request');
+const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const UUID = require('uuid');
 const AWS = require('aws-sdk');
 const StreamZip = require('node-stream-zip');
 AWS.config.update({region: 'us-east-1'});
+// assumes the bucket already exists. make sure it is set up to allow writing objects to it from remote sources!
 const BUCKET_NAME = 'webengine-bundles';
 
 /**
@@ -38,49 +40,41 @@ exports.handleBundle = function (package_url, cb) {
     let bucketUrl = '';
     const TMP_FILE_NAME = `${UUID.v4()}.zip`;
 
-    // create a new bucket if it doesn't already exist
-    new AWS.S3().createBucket({Bucket: BUCKET_NAME, ACL: 'public-read'}, err => {
-        // OperationAborted errors are expected, as we are potentially 
-        // calling this API multiple times simultaneously
-        if (err && err.code !== 'OperationAborted') {
-            return cb(err);
-        }
-        // read the URL and save it to a buffer variable
-        readUrlToBuffer(package_url)
-            .then(zipBuffer => { // submit the file contents to S3
-                compressedSize = zipBuffer.length;
-                const randomString = UUID.v4();
-                const fileName = `${randomString}.zip`;
-                bucketUrl = `https://${BUCKET_NAME}.s3.amazonaws.com/${fileName}`;
-                // make the bundle publicly accessible
-                const objectParams = {Bucket: BUCKET_NAME, ACL: 'public-read', Key: fileName, Body: zipBuffer};
-                // Create object upload promise
-                return new AWS.S3().putObject(objectParams).promise();
-            })
-            .then(() => { // unzip the contents of the bundle to get its uncompressed data information
-                return streamUrlToTmpFile(bucketUrl, TMP_FILE_NAME);
-            })
-            .then(() => {
-                return unzipAndGetUncompressedSize(TMP_FILE_NAME);
-            })
-            .then(uncompressedSize => {
-                // delete the tmp zip file
-                fs.unlink(TMP_FILE_NAME, () => {
-                    // all the information has been collected
-                    cb(null, {
-                        url: bucketUrl,
-                        size_compressed_bytes: compressedSize,
-                        size_decompressed_bytes: uncompressedSize
-                    });
-                });
-            })
-            .catch(err => {
-                // delete the tmp zip file
-                fs.unlink(TMP_FILE_NAME, () => {
-                    cb(err);
+    // read the URL and save it to a buffer variable
+    readUrlToBuffer(package_url)
+        .then(zipBuffer => { // submit the file contents to S3
+            compressedSize = zipBuffer.length;
+            const randomString = UUID.v4();
+            const fileName = `${randomString}.zip`;
+            bucketUrl = `https://${BUCKET_NAME}.s3.amazonaws.com/${fileName}`;
+            // make the bundle publicly accessible
+            const objectParams = {Bucket: BUCKET_NAME, ACL: 'public-read', Key: fileName, Body: zipBuffer};
+            // Create object upload promise
+            return new AWS.S3().putObject(objectParams).promise();
+        })
+        .then(() => { // unzip the contents of the bundle to get its uncompressed data information
+            return streamUrlToTmpFile(bucketUrl, TMP_FILE_NAME);
+        })
+        .then(() => {
+            return unzipAndGetUncompressedSize(TMP_FILE_NAME);
+        })
+        .then(uncompressedSize => {
+            // delete the tmp zip file
+            fs.unlink(TMP_FILE_NAME, () => {
+                // all the information has been collected
+                cb(null, {
+                    url: bucketUrl,
+                    size_compressed_bytes: compressedSize,
+                    size_decompressed_bytes: uncompressedSize
                 });
             });
-    });
+        })
+        .catch(err => {
+            // delete the tmp zip file
+            fs.unlink(TMP_FILE_NAME, () => {
+                cb(err);
+            });
+        });
 }
 
 function unzipAndGetUncompressedSize (fileName) {
@@ -109,25 +103,38 @@ function unzipAndGetUncompressedSize (fileName) {
 }
 
 function streamUrlToTmpFile (url, fileName) {
+    const urlObj = new URL(url);
     return new Promise((resolve, reject) => {
-        request(url)
-            .pipe(fs.createWriteStream(fileName))
-            .on('close', resolve);
+        function resCallback (res) {
+            res.pipe(fs.createWriteStream(fileName)).on('close', resolve);
+        }
+        if (urlObj.protocol === "https:") {
+            https.get(url, resCallback).end();
+        } else {
+            http.get(url, resCallback).end();
+        }
     });
 }
 
 function readUrlToBuffer (url) {
+    const urlObj = new URL(url);
     return new Promise((resolve, reject) => {
         let zipBuffer = [];
-
-        request(url)
-            .on('data', data => {
+        function resCallback (res) {
+            res.on('data', data => {
                 zipBuffer.push(data);
             })
             .on('close', function () { // file fully downloaded
                 // put the zip contents to a buffer 
                 resolve(Buffer.concat(zipBuffer));
             });
+        }
+
+        if (urlObj.protocol === "https:") {
+            https.get(url, resCallback).end();
+        } else {
+            http.get(url, resCallback).end();
+        }
     })
 }
 
