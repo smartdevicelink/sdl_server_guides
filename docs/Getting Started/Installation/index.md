@@ -15,7 +15,7 @@ The following are notable `.env` variables to the docker environment. They are n
 | DB_USER | String | Postgres      | Not required to be set. Defaults to "postgres" |
 | DB_DATABASE | String | Postgres      | Not required to be set. Defaults to "postgres" |
 | CACHE_HOST | String | Redis      | Please do not set this value. It is predefined to work with Docker Compose|
-| BUCKET_NAME | String | WebEngine app support      | The name of the S3 bucket to store app bundles |
+| BUCKET_NAME | String | WebEngine app support      | The name of the S3 bucket to store app bundles. You must create this bucket and configure it to allow remote writing! |
 | AWS_REGION | String | WebEngine app support      | The region of the S3 bucket |
 | AWS_ACCESS_KEY_ID | String | WebEngine app support      | [AWS credentials to allow S3 usage](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/loading-node-credentials-environment.html). These are exclusive to the docker install of the policy server! |
 | AWS_SECRET_ACCESS_KEY | String | WebEngine app support      | [AWS credentials to allow S3 usage](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/loading-node-credentials-environment.html). These are exclusive to the docker install of the policy server! |
@@ -63,6 +63,12 @@ The recommended branch to use is master, which should be used by default. Instal
 ```
 npm install
 ```
+
+NOTE: Starting with the Policy Server v3.1.1, you'll need the following command to install dependencies:
+```
+npm install --legacy-peer-deps
+```
+
 
 The Policy Server requires a SQL database, and currently the only supported implementation is PostgreSQL. In the next section, we will cover how to get one running locally.
 
